@@ -1,0 +1,77 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block body %}
+<!-- Sign Up Start -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center"> <!-- Center row -->
+            <div class="col-md-6"> <!-- Limit width to 6 columns -->
+                <div class="text-center mb-4 wow fadeInUp" data-wow-delay="0.1s">
+                    <h1 class="mb-3"> Broker/Landlord Registration</h1>
+                </div>
+
+                <div class="wow fadeInUp" data-wow-delay="0.3s">
+                    <!-- Important: enctype added for file uploads -->
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <!-- Professional Name -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="username" name="username" placeholder="Your Name" required>
+                                    <label for="username">Professional Name</label>
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" id="email" name="email" placeholder="Your Email" required>
+                                    <label for="email">Email</label>
+                                </div>
+                            </div>
+
+                            <!-- Phone Number (corrected) -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control" id="telephone" name="telephone" 
+                                           placeholder="+256 700 000000" pattern="^\+?[0-9]{10,15}$" required>
+                                    <label for="telephone">Phone Number (+256xxxxxxxxx)</label>
+                                </div>
+                            </div>
+
+                            <!-- Profile Picture Upload -->
+                            <div class="col-12">
+                                <label for="profile_picture" class="form-label">Upload Profile Picture</label>
+                                <input class="form-control" type="file" id="profile_picture" name="profile_picture" accept="image/*" required>
+                            </div>
+
+                            <!-- National ID/Passport Upload -->
+                            <div class="col-12">
+                                <label for="id_passport" class="form-label">Upload National ID / Passport</label>
+                                <input class="form-control" type="file" id="id_passport" name="id_passport" accept="image/*,.pdf" required>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control" placeholder="Leave a message here" id="message" name="message" style="height: 150px"></textarea>
+                                    <label for="message">Message</label>
+                                </div>
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3" type="submit">Register</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sign Up End -->
+{% endblock body %}

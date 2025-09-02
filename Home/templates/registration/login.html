@@ -1,0 +1,88 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block body %}
+<!-- Login Form Start -->
+<div class="container-xxl py-5">
+  <div class="container">
+    <div
+      class="text-center mx-auto mb-5 wow fadeInUp"
+      data-wow-delay="0.1s"
+      style="max-width: 600px;"
+    >
+      <h1 class="mb-3">Login</h1>
+    </div>
+
+    <!-- Center the form -->
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="wow fadeInUp" data-wow-delay="0.5s">
+          <!-- Django login form -->
+          <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <div class="row g-3">
+
+              <!-- Username -->
+              <div class="col-md-12">
+                <div class="form-floating">
+                  <input
+                    type="text"
+                    name="username"
+                    class="form-control"
+                    id="username"
+                    placeholder="Your Username"
+                    required
+                  />
+                  <label for="username">Username</label>
+                </div>
+              </div>
+
+              <!-- Password -->
+              <div class="col-12">
+                <div class="form-floating">
+                  <input
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    id="password"
+                    placeholder="Password"
+                    required
+                  />
+                  <label for="password">Password</label>
+                </div>
+              </div>
+
+              <!-- Submit -->
+              <div class="col-12">
+                <button class="btn btn-primary w-100 py-3" type="submit">
+                  Login
+                </button>
+              </div>
+
+              <!-- Sign Up Options -->
+              <p class="mb-4 mt-3 text-center">
+                Don't have an account?
+                <div class="nav-item dropdown d-inline-block">
+                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Sign Up</a>
+                  <div class="dropdown-menu rounded-0 m-0">
+                    <a href="{% url 'clientsignup' %}" class="dropdown-item">Client</a>
+                    <a href="{% url 'agentsignup' %}" class="dropdown-item">Broker/Landlord</a>
+                  </div>
+                </div>
+              </p>
+
+              <!-- Errors -->
+              {% if form.errors %}
+              <div class="alert alert-danger mt-3">
+                Invalid username or password.
+              </div>
+              {% endif %}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Login Form End -->
+{% endblock body %}

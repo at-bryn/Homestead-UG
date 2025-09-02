@@ -1,0 +1,75 @@
+{% extends "main.html" %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="text-center mb-4 wow fadeInUp" data-wow-delay="0.1s">
+                    <h1 class="mb-3">Sign Up as Client</h1>
+                </div>
+
+                <div class="wow fadeInUp" data-wow-delay="0.3s">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+
+                            <!-- Username -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.username|add_class:"form-control" }}
+                                    <label for="{{ form.username.id_for_label }}">Username</label>
+                                </div>
+                                {% if form.username.errors %}
+                                    <div class="text-danger small">{{ form.username.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.email|add_class:"form-control" }}
+                                    <label for="{{ form.email.id_for_label }}">Email</label>
+                                </div>
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.password1|add_class:"form-control" }}
+                                    <label for="{{ form.password1.id_for_label }}">Password</label>
+                                </div>
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small">{{ form.password1.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.password2|add_class:"form-control" }}
+                                    <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                                </div>
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small">{{ form.password2.errors }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Submit -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 py-3" type="submit">Sign Up</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
