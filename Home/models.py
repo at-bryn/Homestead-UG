@@ -6,12 +6,14 @@ from django.contrib.auth.models import User
 class Agent(models.Model):
     user = models.OneToOneField(User, on_delete = models.CASCADE, null = True, blank = True)
     name= models.CharField(max_length=100)
-    location=models.CharField(max_length=100)
     email = models.EmailField()
     contacts=models.CharField(max_length=20)
-
+    profilepic= models.ImageField(upload_to='uploads/agentprofiles/',default=1)
     description=models.TextField(max_length =500)
-    image= models.ImageField(upload_to='uploads/agents/',default=1)
+    imageID= models.ImageField(upload_to='uploads/agents/',default=1)
+
+    def __str__(self):
+         return self.name
 
 
 class Type(models.Model):
@@ -41,4 +43,10 @@ class Property(models.Model):
         except:
             url = ''
         return url
+    
+
+class Client(models.Model): 
+    user = models.OneToOneField(User, on_delete = models.CASCADE, null = True, blank = True)
+    name= models.CharField(max_length=100)
+    email = models.EmailField()
 
