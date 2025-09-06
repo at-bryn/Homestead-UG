@@ -22,4 +22,10 @@ class AgentForm(ModelForm):
         fields = "__all__"
 
 
+class PropertyForm(ModelForm):
+    class Meta:
+        model = Property
+        fields = "__all__"        
+
+
                                                             

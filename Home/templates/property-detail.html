@@ -1,0 +1,73 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block body %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Image + Album -->
+            <div class="col-lg-6">
+                <!-- Main image -->
+               <a href="{{ property.picture.url }}" data-lightbox="property-album">
+    <img src="{{ property.picture.url }}" class="img-fluid rounded mb-3" alt="{{ property.name }}">
+</a>
+
+                <!-- Album images -->
+<h5 class="mb-3">More Photos</h5>
+<div class="row g-2">
+    {% for photo in property.album.all %}
+        <div class="col-4 mb-2">
+            <a href="{{ photo.image.url }}" data-lightbox="property-album">
+                <img src="{{ photo.image.url }}" class="img-fluid rounded" alt="Extra photo">
+            </a>
+        </div>
+    {% empty %}
+        <p class="text-muted">No extra photos available.</p>
+    {% endfor %}
+</div>
+
+
+                <!-- Navigation video -->
+                {% if property.nav_video %}
+                    <h5 class="mt-4 mb-2">Property Video Tour</h5>
+                    <video controls class="img-fluid rounded"  style="width:500px; max-width:600px; height:500px; border-radius:8px;">
+                        <source src="{{ property.nav_video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                {% endif %}
+            </div>
+
+            <!-- Details -->
+            <div class="col-lg-6">
+                <h1 class="mb-3">{{ property.name }}</h1>
+                <h3 class="text-primary mb-3">UGX {{ property.price }}</h3>
+                <p><i class="fa fa-map-marker-alt text-primary me-2"></i> {{ property.location }}</p>
+                <p>{{ property.description }}</p>
+
+                <ul class="list-group mb-3">
+                    <li class="list-group-item"><strong>Type:</strong> {{ property.type }}</li>
+                    <li class="list-group-item"><strong>Status:</strong> {{ property.selrent }}</li>
+                    <li class="list-group-item"><strong>Size:</strong> {{ property.size }} Sqft</li>
+                    <li class="list-group-item"><strong>Bedrooms:</strong> {{ property.bedrooms }}</li>
+                    <li class="list-group-item"><strong>Bathrooms:</strong> {{ property.bathrooms }}</li>
+                </ul>
+
+<p>
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#agentContact" role="button" aria-expanded="false" aria-controls="agentContact">
+    <i class="fa fa-phone-alt me-2"></i>Contact Agent
+  </a>
+</p>
+
+<!-- Collapsible Content -->
+<div class="collapse" id="agentContact">
+  <div class="card card-body mt-2">
+    <strong>Name:</strong> {{ property.agent.name }}<br>
+    <strong>Contact:</strong> {{ property.agent.contacts }}
+  </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}
