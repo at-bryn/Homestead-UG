@@ -125,6 +125,13 @@ LOGIN_REDIRECT_URL = '/'   # home page after login
 
 LOGOUT_REDIRECT_URL = "/"
 
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
+
 
 
 # Default primary key field type

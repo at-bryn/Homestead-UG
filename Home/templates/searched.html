@@ -1,0 +1,37 @@
+{% extends "main.html" %}
+
+{% block body %}
+<div class="container my-5">
+    <h2 class="mb-4">Search Results</h2>
+    <p>
+        {% if keyword %} <strong>Keyword:</strong> {{ keyword }} {% endif %}
+        {% if price %} | <strong>Price:</strong> {{ price }} {% endif %}
+        {% if location %} | <strong>Location:</strong> {{ location }} {% endif %}
+    </p>
+
+    <div class="row">
+        {% for property in properties %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="property-item rounded overflow-hidden">
+                <div class="position-relative overflow-hidden">
+                    <a href="{% url 'propertydetail' property.id %}">
+                        <img class="img-fluid" src="{{ property.picture.url }}" alt="">
+                    </a>
+                    <div class="bg-primary rounded text-white position-absolute start-0 top-0 m-4 py-1 px-3">
+                        {{ property.selrent }}
+                    </div>
+                </div>
+                <div class="p-4">
+                    <h5 class="mb-3">{{ property.name }}</h5>
+                    <p><i class="fa fa-map-marker-alt text-primary me-2"></i>{{ property.location }}</p>
+                    <p><strong>Price:</strong> {{ property.price }}</p>
+                    <p><strong>Bedrooms:</strong> {{ property.bedrooms }} | <strong>Bathrooms:</strong> {{ property.bathrooms }}</p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No properties found matching your criteria.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

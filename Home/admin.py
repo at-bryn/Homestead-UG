@@ -4,4 +4,6 @@ from .models import *
 admin.site.register(Agent)
 admin.site.register(Type)   
 admin.site.register(Property)
+# admin.site.register(PropertyDetail)
+admin.site.register(PropertyAlbum)
 
