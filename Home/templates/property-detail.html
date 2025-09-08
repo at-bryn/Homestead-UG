@@ -58,13 +58,20 @@
   </a>
 </p>
 
-<!-- Collapsible Content -->
+<!-- Agent contact -->
 <div class="collapse" id="agentContact">
   <div class="card card-body mt-2">
-    <strong>Name:</strong> {{ property.agent.name }}<br>
-    <strong>Contact:</strong> {{ property.agent.contacts }}
+    <p><strong>Name:</strong> {{ property.agent.name }}</p>
+    <p><strong>Contact:</strong> {{ property.agent.contacts }}</p>
+    
+    <!-- Button to Agent Profile -->
+    <a href="{% url 'agentprofile' %}" class="btn btn-outline-primary btn-sm mt-2">
+      <i class="fa fa-user me-2"></i> View Agent Profile
+    </a>
+
   </div>
 </div>
+
 
             </div>
         </div>

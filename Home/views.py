@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
+from django.contrib.auth.views import LoginView, LogoutView
 
 
 def home(request):
@@ -20,8 +21,7 @@ def contact(request):
 def testimonial(request):
     return render(request, 'testimonial.html')
 
-# def property_list(request):
-#     return render(request, 'property-list.html')
+
 
 def property_agent(request):
     return render(request, 'property-agent.html')
@@ -202,3 +202,6 @@ def search(request):
 
 def notfound(request):
     return render(request, '404.html')
+
+class CustomLogoutView(LogoutView):
+    next_page = '/home'
