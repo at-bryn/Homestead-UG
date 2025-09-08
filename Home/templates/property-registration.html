@@ -93,6 +93,14 @@
                         {{ form.description.errors }}
                     </div>
 
+                    <!-- Navigation Video -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload Navigation Video</label>
+                        {{ form.nav_video|add_class:"form-control" }}
+                        <small class="form-text text-muted">Upload one video (mp4, avi, mov, mkv).</small>
+                        {{ form.nav_video.errors }}
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100 py-3">Register Property</button>
                 </form>
             </div>
