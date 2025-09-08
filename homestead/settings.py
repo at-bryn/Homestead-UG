@@ -123,7 +123,8 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 LOGIN_REDIRECT_URL = '/'   # home page after login
 # LOGOUT_REDIRECT_URL = '/login/'  # login page after logout
 
-LOGOUT_REDIRECT_URL = "/"
+LOGOUT_URL = 'logout/'
+LOGOUT_REDIRECT_URL = 'home'
 
 import os
 
