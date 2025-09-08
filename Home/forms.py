@@ -16,11 +16,17 @@ class SignUpForm(UserCreationForm):
 
 
 
-class AgentForm(ModelForm):
+class AgentForm(forms.ModelForm):
     class Meta:
         model = Agent
-        fields = "__all__"
-
+        fields = [
+            'name', 
+            'email', 
+            'contacts', 
+            'profilepic', 
+            'description', 
+            'imageID'
+        ] 
 
 class PropertyForm(ModelForm):
     class Meta:

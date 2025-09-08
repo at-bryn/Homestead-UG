@@ -11,6 +11,7 @@ urlpatterns = [
     path('agents/', views.property_agent, name='agents'),
     path('listings/', views.propertylist, name='listings'),
     
+    
     path('testimonial', views.testimonial, name='testimonial'),
     path("agentprofile", views.agentprofile, name="agentprofile"),
     path("clientlogin", views.clientlogin, name="clientlogin"),
