@@ -16,6 +16,7 @@ urlpatterns = [
     
     path('testimonial', views.testimonial, name='testimonial'),
     path("agentprofile", views.agentprofile, name="agentprofile"),
+    path("agentprofile2/", views.agentprofile2, name="agentprofile2"),
     path("clientlogin", views.clientlogin, name="clientlogin"),
     path("clientsignup", views.clientsignup, name="clientsignup"),
     path("agentsignup", views.agentsignup, name="agentsignup"),

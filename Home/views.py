@@ -7,6 +7,8 @@ from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
+from .models import Agent
+
 
 
 def home(request):
@@ -30,6 +32,15 @@ def property_agent(request):
 
 def agentprofile(request):
     return render(request, 'agent-profile.html')
+
+def agentprofile2(request):
+    try:
+        agent = Agent.objects.get(user=request.user)
+    except Agent.DoesNotExist:
+        agent = None  
+
+    return render(request, "agent-profile2.html", {"agent": agent})
+
 
 def clientlogin(request):
     return render(request, 'client-login.html')
@@ -109,8 +120,9 @@ def agentregistration(request):
             new_agent.save()
             form.save_m2m()  # for any ManyToMany fields
 
+            
             messages.success(request, "Your registration was successful!")
-            return redirect('home')
+            return redirect('agentprofile2')  
         else:
             messages.error(request, "Please correct the errors below.")
     else:
