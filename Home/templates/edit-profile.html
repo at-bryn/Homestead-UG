@@ -1,0 +1,79 @@
+{% extends "main.html" %}
+{% load static %}
+
+{% block body %}
+<!-- Hero / Welcome Section -->
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="bg-light rounded p-3">
+      <div class="bg-white rounded p-4" style="border: 1px dashed rgba(0, 185, 142, .3)">
+        <div class="row g-5 align-items-center">
+          <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+            <img class="img-fluid rounded w-100" src="{% static 'img/team-1.jpg' %}" alt="">
+          </div>
+          <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+            <div class="mb-4">
+              <h1 class="mb-3">Edit Your Profile</h1>
+              <p class="text-muted">Update your details to keep your profile fresh and attractive.</p>
+              <p class="text-success">Welcome back, {{ agent.name }}!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile Form -->
+<div class="container-xxl py-5">
+  <div class="container">
+    <div class="bg-light rounded p-4">
+      <form method="POST" enctype="multipart/form-data" class="bg-white rounded shadow-sm p-4 wow fadeInUp" data-wow-delay="0.3s">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="mb-3">
+          <label for="id_name" class="form-label">Full Name</label>
+          {{ form.name }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_email" class="form-label">Email</label>
+          {{ form.email }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_contacts" class="form-label">Contacts</label>
+          {{ form.contacts }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_profilepic" class="form-label">Profile Picture</label><br>
+          {% if form.instance.profilepic %}
+            <img src="{{ form.instance.profilepic.url }}" alt="Profile Picture" width="120" class="mb-2 rounded">
+          {% endif %}
+          {{ form.profilepic }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_description" class="form-label">Description</label>
+          {{ form.description }}
+        </div>
+
+        <div class="mb-3">
+          <label for="id_imageID" class="form-label">Upload ID Image</label><br>
+          {% if form.instance.imageID %}
+            <img src="{{ form.instance.imageID.url }}" alt="ID Image" width="120" class="mb-2 rounded">
+          {% endif %}
+          {{ form.imageID }}
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary px-4"><i class="fa fa-save me-2"></i>Save Changes</button>
+          <a href="{% url 'agentprofile' %}" class="btn btn-secondary px-4"><i class="fa fa-times me-2"></i>Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

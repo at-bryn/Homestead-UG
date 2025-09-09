@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
 from .models import Agent
+from .forms import AgentEditForm
 
 
 
@@ -40,6 +41,24 @@ def agentprofile2(request):
         agent = None  
 
     return render(request, "agent-profile2.html", {"agent": agent})
+
+
+def edit_profile(request):
+    agent, created = Agent.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        form = AgentEditForm(request.POST, request.FILES, instance=agent)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully!")
+            return redirect('agentprofile2')  # redirect to profile page
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AgentEditForm(instance=agent)
+
+    return render(request, 'edit-profile.html', {'form': form})
+
 
 
 def clientlogin(request):
