@@ -42,6 +42,12 @@ def agentprofile2(request):
 
     return render(request, "agent-profile2.html", {"agent": agent})
 
+def agentprofile2(request):
+    agent = get_object_or_404(Agent, user=request.user)
+    properties = agent.properties.all()
+    return render(request, "agent-profile2.html.html", {"agent": agent, "properties": properties})
+
+
 
 def edit_profile(request):
     agent, created = Agent.objects.get_or_create(user=request.user)
@@ -245,3 +251,36 @@ def notfound(request):
 
 class CustomLogoutView(LogoutView):
     next_page = '/home'
+
+def add_property(request):
+    agent = get_object_or_404(Agent, user=request.user)
+    if request.method == "POST":
+        form = PropertyForm(request.POST, request.FILES)
+        if form.is_valid():
+            property_obj = form.save(commit=False)
+            property_obj.agent = agent
+            property_obj.save()
+            messages.success(request, "Property added successfully!")
+            return redirect("edit-profile.html")
+    else:
+        form = PropertyForm()
+    return render(request, "add-property.html", {"form": form})
+
+def edit_property(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, agent__user=request.user)
+    if request.method == "POST":
+        form = PropertyForm(request.POST, request.FILES, instance=property_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Property updated successfully!")
+            return redirect("dashboard")
+    else:
+        form = PropertyForm(instance=property_obj)
+    return render(request, "edit-property.html", {"form": form})
+
+
+def delete_property(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, agent__user=request.user)
+    property_obj.delete()
+    messages.success(request, "Property removed successfully!")
+    return redirect("edit-profile.html")
