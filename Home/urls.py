@@ -13,8 +13,11 @@ urlpatterns = [
     path('agents/', views.property_agent, name='agents'),
     path('listings/', views.propertylist, name='listings'),
     
+    
     path('testimonial', views.testimonial, name='testimonial'),
     path("agentprofile", views.agentprofile, name="agentprofile"),
+    path("agentprofile2/", views.agentprofile2, name="agentprofile2"),
+    path("edit_profile/", views.edit_profile, name="edit_profile"),
     path("clientlogin", views.clientlogin, name="clientlogin"),
     path("clientsignup", views.clientsignup, name="clientsignup"),
     path("agentsignup", views.agentsignup, name="agentsignup"),
@@ -22,6 +25,11 @@ urlpatterns = [
     path("propertyregistration", views.propertyregistration, name="propertyregistration"),
     path("404", views.notfound, name="404"),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+
+    path("add-property/", views.add_property, name="add_property"),
+    path("edit-property/<int:pk>/", views.edit_property, name="edit_property"),
+    path("delete-property/<int:pk>/", views.delete_property, name="delete_property"),
+    
     # path('logout/', auth_views.LogoutView.as_view(next_page='login'), name='logout'),
     path("properties/<int:pk>/", views.propertydetail, name="propertydetail"),
     path("type/<int:type_id>/", views.properytype, name="type"),

@@ -7,6 +7,9 @@ from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
+from .models import Agent
+from .forms import AgentEditForm
+
 
 
 def home(request):
@@ -30,6 +33,39 @@ def property_agent(request):
 
 def agentprofile(request):
     return render(request, 'agent-profile.html')
+
+def agentprofile2(request):
+    try:
+        agent = Agent.objects.get(user=request.user)
+    except Agent.DoesNotExist:
+        agent = None  
+
+    return render(request, "agent-profile2.html", {"agent": agent})
+
+def agentprofile2(request):
+    agent = get_object_or_404(Agent, user=request.user)
+    properties = agent.properties.all()
+    return render(request, "agent-profile2.html.html", {"agent": agent, "properties": properties})
+
+
+
+def edit_profile(request):
+    agent, created = Agent.objects.get_or_create(user=request.user)
+
+    if request.method == "POST":
+        form = AgentEditForm(request.POST, request.FILES, instance=agent)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Your profile has been updated successfully!")
+            return redirect('agentprofile2')  # redirect to profile page
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AgentEditForm(instance=agent)
+
+    return render(request, 'edit-profile.html', {'form': form})
+
+
 
 def clientlogin(request):
     return render(request, 'client-login.html')
@@ -56,7 +92,7 @@ def clientsignup(request):
                 return redirect('home')  # Redirect to the home page
 
             messages.success(request, "Your account has been created successfully!")
-            return redirect('login')  # Redirect to login page after signup
+            return redirect('clientlogin')  # Redirect to login page after signup
     else:
         form = SignUpForm()
     
@@ -70,48 +106,58 @@ def agentsignup(request):
         if form.is_valid():
             new_agent = form.save()  # saves new user into the Agent table
 
-        group = Group.objects.get(name='Agents')
-        new_agent.groups.add(group) # This adds user into agents group
+            # Add user to Agents group
+            group = Group.objects.get(name='Agents')
+            new_agent.groups.add(group)
 
+            # Extract username and password from the form data
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
 
-        # Extract username and password from the form data
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password1')
+            # Authenticate and log in the user
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Your account has been created successfully!")
+                return redirect('agentregistration')  # Redirect after signup
 
-        # Authenticate the user
-        user = authenticate(request, username=username, password=password)
+        else:
+            # Form is invalid
+            messages.error(request, "There was an error with your signup. Please try again.")
 
-        if user is not None:  # Check if user authentication is successful
-                login(request, user)  # Log in the user
-                return redirect('agentregistration')  # Redirect to the home page
-
-        
-        
-        messages.success(request, "Your account has been created successfully!")
-        return redirect('agentregistration')  # Redirect to login page after signup
     else:
         form = SignUpForm()
-    
-    return render(request, 'agent-signup.html', {'form': form})
 
+    return render(request, 'agent-signup.html', {'form': form})
 # def agentsignup(request):
 #     return render(request, 'agent-signup.html')
 
 def agentregistration(request):
     if request.method == "POST":
-        form = AgentForm(request.POST, request.FILES)
+        form = AgentForm(request.POST, request.FILES)  # include request.FILES for uploads
         if form.is_valid():
-            form.save()  # saves directly into the Agent table
+            new_agent = form.save(commit=False)
+
+            # Assign logged-in user if your model has a ForeignKey to User
+            if request.user.is_authenticated:
+                new_agent.user = request.user
+
+            new_agent.save()
+            form.save_m2m()  # for any ManyToMany fields
 
             
-
-
-        messages.success(request, "Your registration was successful!")
-        return redirect('home')  # redirect to home page
+            messages.success(request, "Your registration was successful!")
+            return redirect('agentprofile2')  
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = AgentForm()
 
     return render(request, 'agent-registration.html', {'form': form})
+            
+
+
+
 
 
 
@@ -205,3 +251,36 @@ def notfound(request):
 
 class CustomLogoutView(LogoutView):
     next_page = '/home'
+
+def add_property(request):
+    agent = get_object_or_404(Agent, user=request.user)
+    if request.method == "POST":
+        form = PropertyForm(request.POST, request.FILES)
+        if form.is_valid():
+            property_obj = form.save(commit=False)
+            property_obj.agent = agent
+            property_obj.save()
+            messages.success(request, "Property added successfully!")
+            return redirect("edit-profile.html")
+    else:
+        form = PropertyForm()
+    return render(request, "add-property.html", {"form": form})
+
+def edit_property(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, agent__user=request.user)
+    if request.method == "POST":
+        form = PropertyForm(request.POST, request.FILES, instance=property_obj)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Property updated successfully!")
+            return redirect("dashboard")
+    else:
+        form = PropertyForm(instance=property_obj)
+    return render(request, "edit-property.html", {"form": form})
+
+
+def delete_property(request, pk):
+    property_obj = get_object_or_404(Property, pk=pk, agent__user=request.user)
+    property_obj.delete()
+    messages.success(request, "Property removed successfully!")
+    return redirect("edit-profile.html")
