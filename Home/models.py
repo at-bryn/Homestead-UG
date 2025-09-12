@@ -83,8 +83,8 @@ class PropertyAlbum(models.Model):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="album")
     image = models.ImageField(upload_to="uploads/properties/album/")
 
-def __str__(self):
-        return f"Album image {self.id} for {self.property.name}"
+    def __str__(self):
+        return f"{self.property.name} Album Image {self.id}"
 
     
 

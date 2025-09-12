@@ -1,0 +1,110 @@
+{% extends "main.html" %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="text-center mb-4">
+                    <h1 class="mb-3">Property Registration</h1>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <!-- Property Name -->
+                    <div class="form-floating mb-3">
+                        {{ form.name|add_class:"form-control" }}
+                        <label for="{{ form.name.id_for_label }}">Property Name</label>
+                        {{ form.name.errors }}
+                    </div>
+
+                    <!-- Property Image (Single) -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload Property Image</label>
+                        {{ form.picture|add_class:"form-control" }}
+                        <small class="form-text text-muted">Upload one image only.</small>
+                        {{ form.picture.errors }}
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-floating mb-3">
+                        {{ form.location|add_class:"form-control" }}
+                        <label for="{{ form.location.id_for_label }}">Location</label>
+                        {{ form.location.errors }}
+                    </div>
+
+                    <!-- Price + Size -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.price|add_class:"form-control" }}
+                                <label for="{{ form.price.id_for_label }}">Price</label>
+                                {{ form.price.errors }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.size|add_class:"form-control" }}
+                                <label for="{{ form.size.id_for_label }}">Size (Sqft)</label>
+                                {{ form.size.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bedrooms + Bathrooms -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.bedrooms|add_class:"form-control" }}
+                                <label for="{{ form.bedrooms.id_for_label }}">Bedrooms</label>
+                                {{ form.bedrooms.errors }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                {{ form.bathrooms|add_class:"form-control" }}
+                                <label for="{{ form.bathrooms.id_for_label }}">Bathrooms</label>
+                                {{ form.bathrooms.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="form-floating mb-3">
+                        {{ form.type|add_class:"form-control" }}
+                        <label for="{{ form.type.id_for_label }}">Property Type</label>
+                        {{ form.type.errors }}
+                    </div>
+
+                    <!-- Sell/Rent -->
+                    <div class="form-floating mb-3">
+                        {{ form.selrent|add_class:"form-control" }}
+                        <label for="{{ form.selrent.id_for_label }}">Sell / Rent</label>
+                        {{ form.selrent.errors }}
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-floating mb-3">
+                        {{ form.description|add_class:"form-control" }}
+                        <label for="{{ form.description.id_for_label }}">Property Description</label>
+                        {{ form.description.errors }}
+                    </div>
+
+                    <!-- Navigation Video -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload Navigation Video</label>
+                        {{ form.nav_video|add_class:"form-control" }}
+                        <small class="form-text text-muted">Upload one video (mp4, avi, mov, mkv).</small>
+                        {{ form.nav_video.errors }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

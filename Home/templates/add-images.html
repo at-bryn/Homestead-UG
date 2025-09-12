@@ -1,0 +1,43 @@
+{% extends "main.html" %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <h2 class="mb-4">Add Image to {{ property.name }}</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label">Select Image</label>
+                {{ form.image|add_class:"form-control" }}
+                {{ form.image.errors }}
+            </div>
+            <button type="submit" class="btn btn-success">Upload</button>
+            <a href="{% url 'manage' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+
+        <!-- Show existing album images -->
+        <h4 class="mt-5">Existing Album</h4>
+<div class="row g-3">
+    {% for img in property.album.all %}
+    <div class="col-md-3 position-relative">
+        <!-- Delete Button -->
+        <form action="{% url 'delete_album_image' img.id %}" method="post" style="position:absolute; top:5px; right:5px; z-index:10;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger p-2" style="border-radius:50%;">
+                <i class="fa fa-trash"></i>
+            </button>
+        </form>
+
+        <!-- Album Image -->
+        <img src="{{ img.image.url }}" class="img-fluid rounded" alt="Property Image">
+    </div>
+    {% empty %}
+    <p>No images in the album yet.</p>
+    {% endfor %}
+</div>
+
+    </div>
+</div>
+{% endblock body %}

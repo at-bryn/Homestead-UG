@@ -1,3 +1,4 @@
+from django.http import HttpResponseRedirect
 from django.shortcuts import render,get_object_or_404
 from .models import *
 from django.shortcuts import redirect
@@ -7,10 +8,15 @@ from django.contrib.auth.models import User,Group
 from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
+from django.urls import reverse, reverse_lazy
 
 
 def home(request):
-    return render(request, 'index.html')
+    is_agent = False
+    if request.user.is_authenticated:
+        is_agent = request.user.groups.filter(name="Agents").exists()
+    return render(request, "index.html", {"is_agent": is_agent})
+
 
 def about_us(request):
     return render(request, 'about.html')
@@ -24,15 +30,53 @@ def testimonial(request):
 
 
 def property_agent(request):
-    return render(request, 'property-agent.html')
+    agents = Agent.objects.all()  # Or filter however you want
+    return render(request, 'property-agents.html', {'agents': agents})
 
 
 
-def agentprofile(request):
-    return render(request, 'agent-profile.html')
+def agent_profile(request, agent_id):
+    agent = Agent.objects.get(id=agent_id)
+    all_properties = Property.objects.filter(agent=agent)
+    sell_properties = all_properties.filter(selrent="Sell")
+    rent_properties = all_properties.filter(selrent="Rent")
+    context = {
+        "agent": agent,
+        "all_properties": all_properties,
+        "sell_properties": sell_properties,
+        "rent_properties": rent_properties
+    }
+    return render(request, "agent-profile.html", context)
 
-def clientlogin(request):
-    return render(request, 'client-login.html')
+
+# def clientlogin(request):
+#     return render(request, 'client-login.html')
+
+
+def agentdb(request):
+    # Get the agent instance for the logged-in user
+    agent = get_object_or_404(Agent, user=request.user)
+
+    # Fetch all properties for this agent
+    properties = Property.objects.filter(agent=agent)
+
+    # Calculate stats
+    stats = {
+        'total_properties': properties.count(),
+        'sold_properties': properties.filter(selrent__iexact='sell').count(),
+        'rented_properties': properties.filter(selrent__iexact='rent').count(),
+        
+    }
+
+    context = {
+        'agent': agent,
+        'stats': stats,
+    }
+
+    return render(request, 'agent-db.html', context)
+
+
+
 
 def clientsignup(request):
     if request.method == 'POST':
@@ -101,13 +145,12 @@ def agentregistration(request):
     if request.method == "POST":
         form = AgentForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()  # saves directly into the Agent table
+            agent = form.save(commit=False)  # Don't save yet
+            agent.user = request.user        # Assign logged-in user
+            agent.save()                     # Now save to DB
 
-            
-
-
-        messages.success(request, "Your registration was successful!")
-        return redirect('home')  # redirect to home page
+            messages.success(request, "Your registration was successful!")
+            return redirect('home')
     else:
         form = AgentForm()
 
@@ -116,17 +159,22 @@ def agentregistration(request):
 
 
 def propertyregistration(request):
+    form = PropertyForm()
+    current_user = request.user
+    agent = Agent.objects.get(user=current_user)   # get the Agent linked to this user
+    
+
     if request.method == "POST":
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
+            form.instance.agent = agent   # attach the logged-in user's agent
             form.save()
             messages.success(request, "Property registered successfully!")
-            return redirect("listings")  # change to your listing page URL name
+            return redirect("listings")
+        else:
+            return render(request, "property-registration.html", {"form": form})
     else:
-        form = PropertyForm()
-    
-    return render(request, "property-registration.html", {"form": form})
-
+        return render(request, "property-registration.html", {"form": form})
 
 
 
@@ -173,7 +221,11 @@ def search(request):
 
     # keyword search
     if keyword:
-        properties = properties.filter(title__icontains=keyword)
+        properties = properties.filter(
+            Q(name__icontains=keyword) |                  # property name
+            Q(description__icontains=keyword) |           # description
+            Q(type__name__icontains=keyword)              # type.name (FK)
+        )
 
     # price search (single value or range, with commas handled)
     if price:
@@ -199,9 +251,156 @@ def search(request):
 
     return render(request, 'searched.html', {'properties': properties})
 
-
 def notfound(request):
     return render(request, '404.html')
 
 class CustomLogoutView(LogoutView):
-    next_page = '/home'
+    next_page = 'home'
+
+
+
+# class CustomLoginView(LoginView):
+#     def get_success_url(self):
+#         user = self.request.user
+#         if user.groups.filter(name='Clients').exists():
+#             return reverse_lazy('home')   # Clients -> Home
+#         elif user.groups.filter(name='Agents').exists():
+#             return reverse_lazy('agentdb')  # Agents -> Agent Dashboard
+#         else:
+#             return reverse_lazy('home')   # Default
+
+
+# class CustomLoginView(LoginView):
+#     def get_success_url(self):
+#         user = self.request.user
+#         print("Logged in user:", user.username)
+#         print("Groups:", list(user.groups.values_list("name", flat=True)))
+
+#         if user.groups.filter(name="Clients").exists():
+#             print("Redirecting to home")
+#             return reverse("home")
+#         elif user.groups.filter(name="Agents").exists():
+#             print("Redirecting to agentdb")
+#             return reverse("agentdb")
+#         else:
+#             print("Redirecting to fallback home")
+#         return reverse("home")
+    
+
+
+# class CustomLoginView(LoginView):
+#     template_name = 'client-login.html'
+
+#     def form_valid(self, form):
+#         # this will definitely run after form authentication succeeds
+#         user = form.get_user()
+#         print("DEBUG form_valid user:", user.username, "groups:", list(user.groups.values_list('name', flat=True)))
+#         if user.groups.filter(name='Agents').exists():
+#             return redirect('agentdb')
+#         return redirect('home')
+
+
+
+# class CustomLoginView(LoginView):
+#     def form_valid(self, form):
+#         """Override form_valid to control redirection based on user group."""
+#         user = form.get_user()
+#         redirect_url = self.get_redirect_url_for_user(user)
+#         return HttpResponseRedirect(redirect_url)
+
+#     def get_redirect_url_for_user(self, user):
+#         """Determine redirect URL based on user's group membership."""
+#         group_redirects = {
+#             'Clients': 'home',
+#             'Agents': 'agentdb',
+#         }
+
+#         user_groups = user.groups.values_list('name', flat=True)
+#         for group_name in group_redirects:
+#             if group_name in user_groups:
+#                 return reverse(group_redirects[group_name])
+
+#         # Default fallback
+#         return reverse('home')
+
+
+class CustomLoginView(LoginView):
+    def get_success_url(self):
+        user = self.request.user
+
+        # Check if user has an associated Agent instance
+        if Agent.objects.filter(user=user).exists():
+            return reverse("agentdb")
+        else:
+            return reverse("home")
+        
+
+def manage(request):
+    # Fetch properties for the logged-in agent
+    properties = Property.objects.filter(agent__user=request.user)
+    return render(request, 'manage.html', {'properties': properties})
+
+
+def edit_property(request, pk):
+    property_instance = get_object_or_404(Property, pk=pk)
+
+    if request.method == "POST":
+        form = PropertyEditForm(request.POST, request.FILES, instance=property_instance)
+        if form.is_valid():
+            form.save()
+            return redirect("manage")
+    else:
+        form = PropertyEditForm(instance=property_instance)
+
+    return render(request, "property-edit.html", {"form": form})
+
+
+
+def delete_property(request, pk):
+    prop = get_object_or_404(Property, pk=pk)
+    if request.method == 'POST':
+        prop.delete()
+        return redirect('agentdb')
+    return render(request, 'confirm-delete.html', {'property': prop})
+
+def edit_agent(request, pk):
+    agent = get_object_or_404(Agent, pk=pk)
+
+    if request.method == "POST":
+        form = AgentEditForm(request.POST, request.FILES, instance=agent)
+        if form.is_valid():
+            form.save()
+            return redirect("agentdb")
+    else:
+        form = AgentEditForm(instance=agent)
+
+    return render(request, "agent-edit.html", {"form": form})
+
+
+def add_property_image(request, property_id):
+    property_instance = get_object_or_404(Property, id=property_id)
+
+    if request.method == "POST":
+        form = PropertyAlbumForm(request.POST, request.FILES)
+        if form.is_valid():
+            album_image = form.save(commit=False)
+            album_image.property = property_instance
+            album_image.save()
+            return redirect('manage')  # Redirect to manage page
+    else:
+        form = PropertyAlbumForm()
+
+    context = {
+        'form': form,
+        'property': property_instance
+    }
+    return render(request, 'add-images.html', context)
+
+
+
+def delete_album_image(request, image_id):
+    image = get_object_or_404(PropertyAlbum, id=image_id)
+    property_id = image.property.id
+    image.delete()
+    return redirect('add_property_image', property_id=property_id)
+
