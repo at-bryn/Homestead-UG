@@ -59,17 +59,34 @@
                 </button>
               </div>
 
-              <!-- Sign Up Options -->
-              <p class="mb-4 mt-3 text-center">
-                Don't have an account?
-                <div class="nav-item dropdown d-inline-block">
-                  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Sign Up</a>
-                  <div class="dropdown-menu rounded-0 m-0">
-                    <a href="{% url 'clientsignup' %}" class="dropdown-item">Client</a>
-                    <a href="{% url 'agentsignup' %}" class="dropdown-item">Broker/Landlord</a>
-                  </div>
-                </div>
-              </p>
+              <!-- Include Bootstrap CSS in <head> -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Sign Up Options -->
+<div class="text-center mb-4 mt-3">
+  <span>Don't have an account? </span>
+  <div class="dropdown d-inline-block">
+    <a class="btn btn-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+      Sign Up
+    </a>
+    <ul class="dropdown-menu">
+      <li><a class="dropdown-item" href="{% url 'clientsignup' %}">Client</a></li>
+      <li><a class="dropdown-item" href="{% url 'agentsignup' %}">Broker/Landlord</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- Include Bootstrap JS Bundle before </body> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Hover highlight for dropdown items -->
+<style>
+.dropdown-item:hover {
+    background-color: #0d6efd; /* Bootstrap primary color */
+    color: white;
+}
+</style>
+
 
               <!-- Errors -->
               {% if form.errors %}

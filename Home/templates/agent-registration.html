@@ -11,53 +11,47 @@
                 </div>
 
                 <form method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.non_field_errors }}
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-                    <!-- Name -->
-                    <div class="form-floating mb-3">
-                        {{ form.name|add_class:"form-control" }}
-                        <label for="{{ form.name.id_for_label }}">Professional Name</label>
-                        {{ form.name.errors }}
-                    </div>
+    <div class="form-floating mb-3">
+        {{ form.name|add_class:"form-control" }}
+        <label for="{{ form.name.id_for_label }}">Professional Name</label>
+        {{ form.name.errors }}
+    </div>
 
-                    <!-- Email -->
-                    <div class="form-floating mb-3">
-                        {{ form.email|add_class:"form-control" }}
-                        <label for="{{ form.email.id_for_label }}">Email</label>
-                        {{ form.email.errors }}
-                    </div>
+    <div class="form-floating mb-3">
+        {{ form.email|add_class:"form-control" }}
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email.errors }}
+    </div>
 
-                    <!-- Phone -->
-                    <div class="form-floating mb-3">
-                        {{ form.contacts|add_class:"form-control" }}
-                        <label for="{{ form.contacts.id_for_label }}">Phone Number (+256xxxxxxxxx)</label>
-                        {{ form.contacts.errors }}
-                    </div>
+    <div class="form-floating mb-3">
+        {{ form.contacts|add_class:"form-control" }}
+        <label for="{{ form.contacts.id_for_label }}">Phone Number (+256xxxxxxxxx)</label>
+        {{ form.contacts.errors }}
+    </div>
 
-                    <!-- Profile Picture -->
-                    <div class="mb-3">
-                        <label class="form-label">Upload Profile Picture</label>
-                        {{ form.profilepic|add_class:"form-control" }}
-                        {{ form.image.errors }}
-                    </div>
+    <div class="mb-3">
+        <label class="form-label">Upload Profile Picture</label>
+        {{ form.profilepic|add_class:"form-control" }}
+        {{ form.profilepic.errors }}
+    </div>
 
-                    <!-- About -->
-                    <div class="form-floating mb-3">
-                        {{ form.description|add_class:"form-control" }}
-                        <label for="{{ form.description.id_for_label }}">About</label>
-                        {{ form.description.errors }}
-                    </div>
+    <div class="form-floating mb-3">
+        {{ form.description|add_class:"form-control" }}
+        <label for="{{ form.description.id_for_label }}">About</label>
+        {{ form.description.errors }}
+    </div>
 
-                     <!-- ID Picture -->
-                    <div class="mb-3">
-                        <label class="form-label">Upload National ID\Passport</label>
-                        {{ form.imageID|add_class:"form-control" }}
-                        {{ form.image.errors }}
-                    </div>
+    <div class="mb-3">
+        <label class="form-label">Upload National ID/Passport</label>
+        {{ form.imageID|add_class:"form-control" }}
+        {{ form.imageID.errors }}
+    </div>
 
-                    <button type="submit" class="btn btn-primary w-100 py-3">Register</button>
-                </form>
+    <button type="submit" class="btn btn-primary w-100 py-3">Register</button>
+</form>
             </div>
         </div>
     </div>

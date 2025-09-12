@@ -3,6 +3,7 @@ from .models import *
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from .models import Agent
 
 
 #This is python form that is to register new users in the database.
@@ -13,18 +14,33 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2')
 
-
-
-
-class AgentForm(ModelForm):
+class AgentEditForm(forms.ModelForm):
     class Meta:
         model = Agent
-        fields = "__all__"
+        fields = ['name', 'email', 'contacts', 'profilepic', 'description', 'imageID']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 4, 'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'contacts': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
     def __init__(self, *args, **kwargs):
         self.request_user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
 
+
+class AgentForm(forms.ModelForm):
+    class Meta:
+        model = Agent
+        fields = [
+            'name', 
+            'email', 
+            'contacts', 
+            'profilepic', 
+            'description', 
+            'imageID'
+        ] 
 
 class PropertyForm(ModelForm):
     class Meta:

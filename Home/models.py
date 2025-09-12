@@ -6,17 +6,16 @@ from django.core.validators import FileExtensionValidator
 
 
 class Agent(models.Model):
-    user = models.OneToOneField(User, on_delete = models.CASCADE, null = True, blank = True)
-    name= models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=100)
     email = models.EmailField()
-    contacts=models.CharField(max_length=20)
-    profilepic= models.ImageField(upload_to='uploads/agentprofiles/',default=1)
-    description=models.TextField(max_length =500)
-    imageID= models.ImageField(upload_to='uploads/agents/',default=1)
-    # imageID = models.JSONField(default=list) 
+    contacts = models.CharField(max_length=20)
+    profilepic = models.ImageField(upload_to='uploads/agentprofiles/', null=True, blank=True)
+    description = models.TextField(max_length=500)
+    imageID = models.ImageField(upload_to='uploads/agents/', null=True, blank=True)
 
     def __str__(self):
-         return self.name
+        return self.name
 
 
 class Type(models.Model):

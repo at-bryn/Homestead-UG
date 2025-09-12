@@ -100,7 +100,7 @@ def clientsignup(request):
                 return redirect('home')  # Redirect to the home page
 
             messages.success(request, "Your account has been created successfully!")
-            return redirect('login')  # Redirect to login page after signup
+            return redirect('clientlogin')  # Redirect to login page after signup
     else:
         form = SignUpForm()
     
@@ -114,36 +114,35 @@ def agentsignup(request):
         if form.is_valid():
             new_agent = form.save()  # saves new user into the Agent table
 
-        group = Group.objects.get(name='Agents')
-        new_agent.groups.add(group) # This adds user into agents group
+            # Add user to Agents group
+            group = Group.objects.get(name='Agents')
+            new_agent.groups.add(group)
 
+            # Extract username and password from the form data
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
 
-        # Extract username and password from the form data
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password1')
+            # Authenticate and log in the user
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.success(request, "Your account has been created successfully!")
+                return redirect('agentregistration')  # Redirect after signup
 
-        # Authenticate the user
-        user = authenticate(request, username=username, password=password)
+        else:
+            # Form is invalid
+            messages.error(request, "There was an error with your signup. Please try again.")
 
-        if user is not None:  # Check if user authentication is successful
-                login(request, user)  # Log in the user
-                return redirect('agentregistration')  # Redirect to the home page
-
-        
-        
-        messages.success(request, "Your account has been created successfully!")
-        return redirect('agentregistration')  # Redirect to login page after signup
     else:
         form = SignUpForm()
-    
-    return render(request, 'agent-signup.html', {'form': form})
 
+    return render(request, 'agent-signup.html', {'form': form})
 # def agentsignup(request):
 #     return render(request, 'agent-signup.html')
 
 def agentregistration(request):
     if request.method == "POST":
-        form = AgentForm(request.POST, request.FILES)
+        form = AgentForm(request.POST, request.FILES)  # include request.FILES for uploads
         if form.is_valid():
             agent = form.save(commit=False)  # Don't save yet
             agent.user = request.user        # Assign logged-in user
@@ -155,6 +154,10 @@ def agentregistration(request):
         form = AgentForm()
 
     return render(request, 'agent-registration.html', {'form': form})
+            
+
+
+
 
 
 
