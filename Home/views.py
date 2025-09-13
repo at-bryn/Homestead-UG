@@ -42,10 +42,7 @@ def agentprofile2(request):
 
     return render(request, "agent-profile2.html", {"agent": agent})
 
-def agentprofile2(request):
-    agent = get_object_or_404(Agent, user=request.user)
-    properties = agent.properties.all()
-    return render(request, "agent-profile2.html.html", {"agent": agent, "properties": properties})
+
 
 
 
@@ -68,6 +65,15 @@ def edit_profile(request):
 
 
 def clientlogin(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('agentprofile2')  # Redirect to a success page.
+        else:
+            messages.error(request, 'Invalid credentials')
     return render(request, 'client-login.html')
 
 def clientsignup(request):
