@@ -9,7 +9,7 @@
             <div class="col-lg-6">
                 <!-- Main image -->
                <a href="{{ property.picture.url }}" data-lightbox="property-album">
-    <img src="{{ property.picture.url }}" class="img-fluid rounded mb-3" alt="{{ property.name }}">
+    <img src="{{ property.picture.url }}" class="img-fluid rounded mb-3" alt="{{ property.name }}" style= " object-fit: cover;" >
 </a>
 
                 <!-- Album images -->
@@ -65,9 +65,9 @@
     <p><strong>Contact:</strong> {{ property.agent.contacts }}</p>
     
     <!-- Button to Agent Profile -->
-    <a href="{% url 'agentprofile' %}" class="btn btn-outline-primary btn-sm mt-2">
-      <i class="fa fa-user me-2"></i> View Agent Profile
-    </a>
+<a href="{% url 'agentprofile' property.agent.id %}" class="btn btn-outline-primary btn-sm mt-2">
+    <i class="fa fa-user me-2"></i> View Agent Profile
+</a>
 
   </div>
 </div>

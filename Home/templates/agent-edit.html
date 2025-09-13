@@ -1,0 +1,65 @@
+{% extends "main.html" %}
+{% load widget_tweaks %}
+
+{% block body %}
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="text-center mb-4">
+                    <h1 class="mb-3">Broker/Landlord Registration</h1>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+
+                    <!-- Name -->
+                    <div class="form-floating mb-3">
+                        {{ form.name|add_class:"form-control" }}
+                        <label for="{{ form.name.id_for_label }}">Professional Name</label>
+                        {{ form.name.errors }}
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-floating mb-3">
+                        {{ form.email|add_class:"form-control" }}
+                        <label for="{{ form.email.id_for_label }}">Email</label>
+                        {{ form.email.errors }}
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-floating mb-3">
+                        {{ form.contacts|add_class:"form-control" }}
+                        <label for="{{ form.contacts.id_for_label }}">Phone Number (+256xxxxxxxxx)</label>
+                        {{ form.contacts.errors }}
+                    </div>
+
+                    <!-- Profile Picture -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload Profile Picture</label>
+                        {{ form.profilepic|add_class:"form-control" }}
+                        {{ form.image.errors }}
+                    </div>
+
+                    <!-- About -->
+                    <div class="form-floating mb-3">
+                        {{ form.description|add_class:"form-control" }}
+                        <label for="{{ form.description.id_for_label }}">About</label>
+                        {{ form.description.errors }}
+                    </div>
+
+                     <!-- ID Picture -->
+                    <div class="mb-3">
+                        <label class="form-label">Upload National ID\Passport</label>
+                        {{ form.imageID|add_class:"form-control" }}
+                        {{ form.image.errors }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock body %}

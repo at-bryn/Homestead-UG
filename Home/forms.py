@@ -25,6 +25,10 @@ class AgentEditForm(forms.ModelForm):
             'contacts': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        self.request_user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
 
 class AgentForm(forms.ModelForm):
     class Meta:
@@ -41,7 +45,28 @@ class AgentForm(forms.ModelForm):
 class PropertyForm(ModelForm):
     class Meta:
         model = Property
-        fields = "__all__"        
+        fields = "__all__"     
+
+
+class PropertyEditForm(forms.ModelForm):
+    class Meta:
+        model = Property
+        exclude = ['agent']
+
+
+class AgentEditForm(forms.ModelForm):
+    class Meta:
+        model = Agent
+        exclude = ['user']   
+
+
+class PropertyAlbumForm(forms.ModelForm):
+    class Meta:
+        model = PropertyAlbum
+        fields = ['image']
+        widgets = {
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': 'image/*'}),
+        }                     
 
 
                                                             

@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'Home.context_processors.is_agent',
             ],
         },
     },
@@ -120,11 +121,11 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
-LOGIN_REDIRECT_URL = '/'   # home page after login
+#LOGIN_REDIRECT_URL = '/'   # home page after login
 # LOGOUT_REDIRECT_URL = '/login/'  # login page after logout
 
 LOGOUT_URL = 'logout/'
-LOGOUT_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = '/'
 
 import os
 
