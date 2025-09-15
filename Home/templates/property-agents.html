@@ -7,37 +7,22 @@
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
-            <h1 class="mb-3">Property Agents</h1>
-            <p>Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed rebum vero dolor duo.</p>
+            <h1 class="mb-3">Meet Our Property Agents</h1>
+            <p>
+                Our experienced and certified real estate agents are here to help you 
+                find the right property. Whether you’re buying, renting, or investing, 
+                you can count on their expertise and local market knowledge.
+            </p>
         </div>
         <div class="row g-4">
             {% for agent in agents %}
             <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="team-item rounded overflow-hidden"  >
+                <div class="team-item rounded overflow-hidden">
                     <div class="position-relative">
                         <img class="img-fluid" src="{{ agent.profilepic.url }}" alt="{{ agent.name }}" style="width: 100%; height: 250px; object-fit: cover;">
-                        <!-- <div class="position-absolute start-50 top-100 translate-middle d-flex align-items-center">
-                            {% if agent.facebook_url %}
-                            <a class="btn btn-square mx-1" href="{{ agent.facebook_url }}"><i class="fab fa-facebook-f"></i></a>
-                            {% endif %}
-                            {% if agent.twitter_url %}
-                            <a class="btn btn-square mx-1" href="{{ agent.twitter_url }}"><i class="fab fa-twitter"></i></a>
-                            {% endif %}
-                            {% if agent.instagram_url %}
-                            <a class="btn btn-square mx-1" href="{{ agent.instagram_url }}"><i class="fab fa-instagram"></i></a>
-                            {% endif %}
-                        </div> -->
                     </div>
                     <div class="text-center p-4 mt-3">
                         <h5 class="fw-bold mb-0">{{ agent.name }}</h5>
-                        <!-- <small>{{ agent.designation }}</small>
-                        <div class="rating mt-1">
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star-fill text-warning"></i>
-                            <i class="bi bi-star text-warning"></i>
-                        </div> -->
                         <a href="{% url 'agentprofile' agent.id %}" class="btn btn-primary py-3 px-4 mt-2">View Profile</a>
                     </div>
                 </div>
@@ -48,6 +33,7 @@
 </div>
 <!-- Team End -->
 
+
 <!-- Call to Action Start -->
 <div class="container-xxl py-5">
     <div class="container">
@@ -55,15 +41,22 @@
             <div class="bg-white rounded p-4" style="border: 1px dashed rgba(0, 185, 142, .3)">
                 <div class="row g-5 align-items-center">
                     <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
-                        <img class="img-fluid rounded w-100" src="{% static 'img/call-to-action.jpg'%}" alt="">
+                        <img class="img-fluid rounded w-100" src="{% static 'img/istock.jpg' %}" alt="Contact an Agent">
                     </div>
                     <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
                         <div class="mb-4">
-                            <h1 class="mb-3">Contact With Our Certified Agent</h1>
-                            <p>Eirmod sed ipsum dolor sit rebum magna erat. Tempor lorem kasd vero ipsum sit sit diam justo sed vero dolor duo.</p>
+                            <h1 class="mb-3">Work With Our Certified Agents</h1>
+                            <p>
+                                Looking for your dream home or the perfect investment property? 
+                                Get in touch with our trusted agents today and let us guide you every step of the way.
+                            </p>
                         </div>
-                        <a href="" class="btn btn-primary py-3 px-4 me-2"><i class="fa fa-phone-alt me-2"></i>Make A Call</a>
-                        <a href="" class="btn btn-dark py-3 px-4"><i class="fa fa-calendar-alt me-2"></i>Get Appointment</a>
+                        <a href="tel:+256700000000" class="btn btn-primary py-3 px-4 me-2">
+                            <i class="fa fa-phone-alt me-2"></i>Call Now
+                        </a>
+                        <a href="{% url 'agents' %}" class="btn btn-dark py-3 px-4">
+                            <i class="fa fa-calendar-alt me-2"></i>Book Appointment
+                        </a>
                     </div>
                 </div>
             </div>
