@@ -53,24 +53,48 @@
                 </ul>
 
 <p>
-  <a class="btn btn-primary" data-bs-toggle="collapse" href="#agentContact" role="button" aria-expanded="false" aria-controls="agentContact">
-    <i class="fa fa-phone-alt me-2"></i>Contact Agent
-  </a>
-</p>
+  {% if user.is_authenticated %}
+    <!-- Show the collapsible contact agent if logged in -->
+    <a class="btn btn-primary" data-bs-toggle="collapse" href="#agentContact" role="button" aria-expanded="false" aria-controls="agentContact">
+      <i class="fa fa-phone-alt me-2"></i>Contact Agent
+    </a>
 
-<!-- Agent contact -->
-<div class="collapse" id="agentContact">
+
+    <div class="collapse" id="agentContact">
   <div class="card card-body mt-2">
     <p><strong>Name:</strong> {{ property.agent.name }}</p>
     <p><strong>Contact:</strong> {{ property.agent.contacts }}</p>
     
     <!-- Button to Agent Profile -->
-<a href="{% url 'agentprofile' property.agent.id %}" class="btn btn-outline-primary btn-sm mt-2">
-    <i class="fa fa-user me-2"></i> View Agent Profile
-</a>
-
+    <a href="{% url 'agentprofile' property.agent.id %}" class="btn btn-outline-primary btn-sm mt-2">
+      <i class="fa fa-user me-2"></i> View Agent Profile
+    </a>
   </div>
 </div>
+
+  {% else %}
+    <!-- Redirect to login if not logged in -->
+    <a href="{% url 'login' %}" class="btn btn-primary">
+      <i class="fa fa-phone-alt me-2"></i>Contact Agent
+    </a>
+  {% endif %}
+</p>
+
+<!-- Agent contact info -->
+<!-- {% if user.is_authenticated %}
+<div class="collapse" id="agentContact">
+  <div class="card card-body mt-2">
+    <p><strong>Name:</strong> {{ property.agent.name }}</p>
+    <p><strong>Contact:</strong> {{ property.agent.contacts }}</p> -->
+    
+    <!-- Button to Agent Profile -->
+    <!-- <a href="{% url 'agentprofile' property.agent.id %}" class="btn btn-outline-primary btn-sm mt-2">
+      <i class="fa fa-user me-2"></i> View Agent Profile
+    </a>
+  </div>
+</div>
+{% endif %} -->
+
 
 
             </div>
