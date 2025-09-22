@@ -173,13 +173,13 @@ def agentregistration(request):
 def propertyregistration(request):
     form = PropertyForm()
     current_user = request.user
-    agent = Agent.objects.get(user=current_user)   # get the Agent linked to this user
+    y = Agent.objects.get(user=current_user)   # get the Agent linked to this user
     
 
     if request.method == "POST":
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
-            form.instance.agent = agent   # attach the logged-in user's agent
+            form.instance.agent = y   # attach the logged-in user's agent
             form.save()
             messages.success(request, "Property registered successfully!")
             return redirect("listings")
@@ -262,6 +262,8 @@ def search(request):
         properties = properties.filter(location__icontains=location)
 
     return render(request, 'searched.html', {'properties': properties})
+
+
 
 def notfound(request):
     return render(request, '404.html')
