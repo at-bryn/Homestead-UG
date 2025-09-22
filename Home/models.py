@@ -15,7 +15,7 @@ class Agent(models.Model):
     imageID = models.ImageField(upload_to='uploads/agents/', null=True)
 
     def __str__(self):
-        return self.name
+        return self.name + '  ' + self.email
 
 
 class Type(models.Model):
@@ -48,7 +48,7 @@ class Property(models.Model):
    
     
     def __str__(self):
-        return self.name + ' '+ self.location
+        return self.name + '-- '+ self.location
     
 
 
