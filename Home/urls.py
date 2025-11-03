@@ -38,6 +38,7 @@ urlpatterns = [
     path("agent/<int:pk>/edit/", views.edit_agent, name="edit_agent"),
     path('property/<int:property_id>/add-image/', views.add_property_image, name='add_property_image'),
     path('album-image/<int:image_id>/delete/', views.delete_album_image, name='delete_album_image'),
+    path('admindb/', views.admin_dashboard, name='admin_dashboard'),
 
 
 

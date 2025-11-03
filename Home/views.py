@@ -10,6 +10,13 @@ from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse, reverse_lazy
 
+import matplotlib
+matplotlib.use('Agg')  # For server environments without GUI
+import matplotlib.pyplot as plt
+import io, base64
+from django.db.models import Count, Avg
+
+
 
 def home(request):
     is_agent = False
@@ -262,69 +269,7 @@ class CustomLogoutView(LogoutView):
 
 
 
-# class CustomLoginView(LoginView):
-#     def get_success_url(self):
-#         user = self.request.user
-#         if user.groups.filter(name='Clients').exists():
-#             return reverse_lazy('home')   # Clients -> Home
-#         elif user.groups.filter(name='Agents').exists():
-#             return reverse_lazy('agentdb')  # Agents -> Agent Dashboard
-#         else:
-#             return reverse_lazy('home')   # Default
 
-
-# class CustomLoginView(LoginView):
-#     def get_success_url(self):
-#         user = self.request.user
-#         print("Logged in user:", user.username)
-#         print("Groups:", list(user.groups.values_list("name", flat=True)))
-
-#         if user.groups.filter(name="Clients").exists():
-#             print("Redirecting to home")
-#             return reverse("home")
-#         elif user.groups.filter(name="Agents").exists():
-#             print("Redirecting to agentdb")
-#             return reverse("agentdb")
-#         else:
-#             print("Redirecting to fallback home")
-#         return reverse("home")
-    
-
-
-# class CustomLoginView(LoginView):
-#     template_name = 'client-login.html'
-
-#     def form_valid(self, form):
-#         # this will definitely run after form authentication succeeds
-#         user = form.get_user()
-#         print("DEBUG form_valid user:", user.username, "groups:", list(user.groups.values_list('name', flat=True)))
-#         if user.groups.filter(name='Agents').exists():
-#             return redirect('agentdb')
-#         return redirect('home')
-
-
-
-# class CustomLoginView(LoginView):
-#     def form_valid(self, form):
-#         """Override form_valid to control redirection based on user group."""
-#         user = form.get_user()
-#         redirect_url = self.get_redirect_url_for_user(user)
-#         return HttpResponseRedirect(redirect_url)
-
-#     def get_redirect_url_for_user(self, user):
-#         """Determine redirect URL based on user's group membership."""
-#         group_redirects = {
-#             'Clients': 'home',
-#             'Agents': 'agentdb',
-#         }
-
-#         user_groups = user.groups.values_list('name', flat=True)
-#         for group_name in group_redirects:
-#             if group_name in user_groups:
-#                 return reverse(group_redirects[group_name])
-
-#         # Default fallback
-#         return reverse('home')
 
 
 class CustomLoginView(LoginView):
@@ -407,3 +352,94 @@ def delete_album_image(request, image_id):
     image.delete()
     return redirect('add_property_image', property_id=property_id)
 
+
+def admin_dashboard(request):
+    # --- Only admins should access ---
+    if not request.user.is_superuser:
+        messages.error(request, "Access denied. Admins only.")
+        return redirect('home')
+
+    # --- Stats ---
+    total_properties = Property.objects.count()
+    total_agents = Agent.objects.count()
+    total_clients = User.objects.filter(groups__name='Clients').count()
+
+    # Sell/Rent split
+    sell_count = Property.objects.filter(selrent__iexact="Sell").count()
+    rent_count = Property.objects.filter(selrent__iexact="Rent").count()
+
+    # Property per type
+    property_type_data = (
+        Property.objects.values('type__name')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+
+    # ------------------------------
+    # Chart 1: Sell vs Rent Pie Chart
+    # ------------------------------
+    plt.figure(figsize=(4, 4))
+    labels = ['Sell', 'Rent']
+    values = [sell_count, rent_count]
+    plt.pie(values, labels=labels, autopct='%1.1f%%', colors=['#00b98e', '#f39c12'])
+    plt.title("Property Distribution (Sell vs Rent)")
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    pie_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+    # ------------------------------
+    # Chart 2: Properties per Type Pie Chart
+    # ------------------------------
+    plt.figure(figsize=(5, 5))
+    labels = [d['type__name'] for d in property_type_data]
+    sizes = [d['total'] for d in property_type_data]
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title("Properties per Type")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    type_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+    # ------------------------------
+    # Chart 3: Histogram of Property Prices
+    # ------------------------------
+    prices = Property.objects.values_list('price', flat=True)
+    prices = [p for p in prices if p is not None]
+
+    plt.figure(figsize=(6, 4))
+    plt.hist(prices, bins=10, edgecolor='black', color='#3498db')
+    plt.title("Distribution of Property Prices")
+    plt.xlabel("Price Range")
+    plt.ylabel("Number of Properties")
+    plt.tight_layout()
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    price_hist = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+   
+
+
+    # ------------------------------
+    # Context
+    # ------------------------------
+    context = {
+        'total_properties': total_properties,
+        'total_agents': total_agents,
+        'total_clients': total_clients,
+        'sell_count': sell_count,
+        'rent_count': rent_count,
+        'pie_chart': pie_chart,
+        'type_chart': type_chart,
+        'price_hist': price_hist,
+    }
+
+    return render(request, 'admin-dashboard.html', context)
