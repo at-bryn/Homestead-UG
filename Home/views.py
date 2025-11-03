@@ -334,7 +334,7 @@ def add_property_image(request, property_id):
             album_image = form.save(commit=False)
             album_image.property = property_instance
             album_image.save()
-            return redirect('manage')  # Redirect to manage page
+            return redirect('manage')  
     else:
         form = PropertyAlbumForm()
 
@@ -354,12 +354,12 @@ def delete_album_image(request, image_id):
 
 
 def admin_dashboard(request):
-    # --- Only admins should access ---
+    # Only admins should access
     if not request.user.is_superuser:
         messages.error(request, "Access denied. Admins only.")
         return redirect('home')
 
-    # --- Stats ---
+    # Stats
     total_properties = Property.objects.count()
     total_agents = Agent.objects.count()
     total_clients = User.objects.filter(groups__name='Clients').count()
@@ -375,9 +375,9 @@ def admin_dashboard(request):
         .order_by('-total')
     )
 
-    # ------------------------------
+   
     # Chart 1: Sell vs Rent Pie Chart
-    # ------------------------------
+  
     plt.figure(figsize=(4, 4))
     labels = ['Sell', 'Rent']
     values = [sell_count, rent_count]
@@ -390,9 +390,9 @@ def admin_dashboard(request):
     buf.close()
     plt.close()
 
-    # ------------------------------
+ 
     # Chart 2: Properties per Type Pie Chart
-    # ------------------------------
+    
     plt.figure(figsize=(5, 5))
     labels = [d['type__name'] for d in property_type_data]
     sizes = [d['total'] for d in property_type_data]
@@ -406,9 +406,9 @@ def admin_dashboard(request):
     buf.close()
     plt.close()
 
-    # ------------------------------
+
     # Chart 3: Histogram of Property Prices
-    # ------------------------------
+  
     prices = Property.objects.values_list('price', flat=True)
     prices = [p for p in prices if p is not None]
 
@@ -427,10 +427,6 @@ def admin_dashboard(request):
 
    
 
-
-    # ------------------------------
-    # Context
-    # ------------------------------
     context = {
         'total_properties': total_properties,
         'total_agents': total_agents,
