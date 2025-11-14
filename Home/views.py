@@ -9,19 +9,21 @@ from django.contrib.auth import authenticate,login,logout
 from django.db.models import Q
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse, reverse_lazy
-from django.contrib.auth.decorators import login_required
-from .decorators import allowed_users
 
+import matplotlib
+matplotlib.use('Agg')  # For server environments without GUI
+import matplotlib.pyplot as plt
+import io, base64
+from django.db.models import Count, Avg
 
-# def home(request):
-#     is_agent = False
-#     if request.user.is_authenticated:
-#         is_agent = request.user.groups.filter(name="Agents").exists()
-#     return render(request, "index.html", {"is_agent": is_agent})
 
 
 def home(request):
-    return render(request, 'index.html')
+    is_agent = False
+    if request.user.is_authenticated:
+        is_agent = request.user.groups.filter(name="Agents").exists()
+    return render(request, "index.html", {"is_agent": is_agent})
+
 
 def about_us(request):
     return render(request, 'about.html')
@@ -29,7 +31,8 @@ def about_us(request):
 def contact(request):
     return render(request, 'contact.html')
 
-
+def testimonial(request):
+    return render(request, 'testimonial.html')
 
 
 
@@ -39,7 +42,6 @@ def property_agent(request):
 
 
 
-@login_required(login_url= "login")
 def agent_profile(request, agent_id):
     agent = Agent.objects.get(id=agent_id)
     all_properties = Property.objects.filter(agent=agent)
@@ -54,11 +56,10 @@ def agent_profile(request, agent_id):
     return render(request, "agent-profile.html", context)
 
 
+# def clientlogin(request):
+#     return render(request, 'client-login.html')
 
 
-
-@login_required(login_url= "login")
-@allowed_users(allowed_roles=['Agents','Admin'])
 def agentdb(request):
     # Get the agent instance for the logged-in user
     agent = get_object_or_404(Agent, user=request.user)
@@ -143,9 +144,8 @@ def agentsignup(request):
         form = SignUpForm()
 
     return render(request, 'agent-signup.html', {'form': form})
-
-
-
+# def agentsignup(request):
+#     return render(request, 'agent-signup.html')
 
 def agentregistration(request):
     if request.method == "POST":
@@ -167,19 +167,17 @@ def agentregistration(request):
 
 
 
-@login_required(login_url= "login")
-@allowed_users(allowed_roles=['Agents','Admin'])
 
 def propertyregistration(request):
     form = PropertyForm()
     current_user = request.user
-    y = Agent.objects.get(user=current_user)   # get the Agent linked to this user
+    agent = Agent.objects.get(user=current_user)   # get the Agent linked to this user
     
 
     if request.method == "POST":
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
-            form.instance.agent = y   # attach the logged-in user's agent
+            form.instance.agent = agent   # attach the logged-in user's agent
             form.save()
             messages.success(request, "Property registered successfully!")
             return redirect("listings")
@@ -263,13 +261,13 @@ def search(request):
 
     return render(request, 'searched.html', {'properties': properties})
 
-
-
 def notfound(request):
     return render(request, '404.html')
 
 class CustomLogoutView(LogoutView):
     next_page = 'home'
+
+
 
 
 
@@ -336,7 +334,7 @@ def add_property_image(request, property_id):
             album_image = form.save(commit=False)
             album_image.property = property_instance
             album_image.save()
-            return redirect('manage')  # Redirect to manage page
+            return redirect('manage')  
     else:
         form = PropertyAlbumForm()
 
@@ -354,3 +352,153 @@ def delete_album_image(request, image_id):
     image.delete()
     return redirect('add_property_image', property_id=property_id)
 
+
+
+
+def admin_dashboard(request):
+
+    # Stats
+    total_properties = Property.objects.count()
+    total_agents = Agent.objects.count()
+    total_clients = User.objects.filter(groups__name='Clients').count()
+
+    # Sell/Rent split
+    sell_count = Property.objects.filter(selrent__iexact="Sell").count()
+    rent_count = Property.objects.filter(selrent__iexact="Rent").count()
+
+    # Property per type
+    property_type_data = (
+        Property.objects.values('type__name')
+        .annotate(total=Count('id'))
+        .order_by('-total')
+    )
+
+   
+    # Chart 1: Sell vs Rent Pie Chart
+  
+    plt.figure(figsize=(4, 4))
+    labels = ['Sell', 'Rent']
+    values = [sell_count, rent_count]
+    plt.pie(values, labels=labels, autopct='%1.1f%%', colors=['#00b98e', '#f39c12'])
+    plt.title("Property Distribution (Sell vs Rent)")
+    plt.tight_layout(pad=3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    pie_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+ 
+    # Chart 2: Properties per Type Pie Chart
+    
+    plt.figure(figsize=(5, 5))
+    labels = [d['type__name'] for d in property_type_data]
+    sizes = [d['total'] for d in property_type_data]
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90)
+    plt.title("Properties per Type")
+    plt.tight_layout(pad=3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    type_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+
+    # Chart 3: Histogram of Property Prices
+  
+    prices = Property.objects.values_list('price', flat=True)
+    prices = [p for p in prices if p is not None]
+
+    plt.figure(figsize=(5, 5))
+    plt.hist(prices, bins=10, edgecolor='black', color='#3498db')
+  
+
+    plt.title("Distribution of Property Prices")
+    plt.xlabel("Price Range")
+    plt.ylabel("Number of Properties")
+    plt.tight_layout(pad=3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png')
+    buf.seek(0)
+    price_hist = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+
+
+    # Chart 4: Top 10 Agents by Number of Properties
+    agent_property_counts = (
+        Property.objects.values('agent__user__username')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:10]
+    )
+
+    agents = [a['agent__user__username'] for a in agent_property_counts]
+    totals = [a['total'] for a in agent_property_counts]
+
+    plt.figure(figsize=(9, 5))
+    plt.barh(agents, totals, color='#1abc9c')
+    plt.gca().invert_yaxis()  # Highest at top
+    plt.title("Top 10 Agents by Properties", fontsize=12)
+    plt.xlabel("Number of Properties", fontsize=10)
+    plt.ylabel("Agent", fontsize=10)
+    plt.tight_layout(pad=3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    top_agents_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+
+
+    # Chart 5: Top 10 Locations for Properties
+    location_counts = (
+        Property.objects.values('location')
+        .annotate(total=Count('id'))
+        .order_by('-total')[:10]
+    )
+
+    locations = [l['location'] for l in location_counts]
+    counts = [l['total'] for l in location_counts]
+
+    plt.figure(figsize=(9, 5))
+    plt.barh(locations, counts, color='#e74c3c')
+    plt.gca().invert_yaxis()
+    plt.title("Top 10 Locations", fontsize=12)
+    plt.xlabel("Number of Properties", fontsize=10)
+    plt.ylabel("Location", fontsize=10)
+    plt.tight_layout(pad=3)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+    top_locations_chart = base64.b64encode(buf.getvalue()).decode('utf-8')
+    buf.close()
+    plt.close()
+
+
+
+   
+
+    context = {
+    'total_properties': total_properties,
+    'total_agents': total_agents,
+    'total_clients': total_clients,
+    'sell_count': sell_count,
+    'rent_count': rent_count,
+    'pie_chart': pie_chart,
+    'type_chart': type_chart,
+    'price_hist': price_hist,
+    'top_agents_chart': top_agents_chart,
+    'top_locations_chart': top_locations_chart,
+}
+
+
+    return render(request, 'admin-dashboard.html', context)
